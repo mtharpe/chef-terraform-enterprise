@@ -1,0 +1,35 @@
+---
+driver:
+  name: vagrant
+  customize:
+    memory: 4096
+  gui: false
+
+driver_config:
+  network:
+  - ["forwarded_port", {guest: 8800, host: 8800}]
+  - ["forwarded_port", {guest: 80, host: 8080}]
+  - ["forwarded_port", {guest: 443, host: 8443}]
+provisioner:
+  sudo: true
+  name: chef_zero
+  product_name: chef
+  chef_license: accept
+  install_strategy: always
+  always_update_cookbooks: true
+
+
+verifier:
+  name: inspec
+
+platforms:
+  - name: generic/ubuntu1604
+  - name: generic/ubuntu1804
+  - name: generic/ubuntu2004
+
+suites:
+  - name: default
+    verifier:
+      inspec_tests:
+        - test/integration/default
+    attributes:
