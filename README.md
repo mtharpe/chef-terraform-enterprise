@@ -1,4 +1,4 @@
-[![pipeline status](https://gitlab.com/chef-recipes/terraform_enterprise/badges/master/pipeline.svg)](https://gitlab.com/chef-recipes/terraform_enterprise/-/commits/master)
+![Chef Validation and Testing](https://github.com/mtharpe/chef-terraform-enterprise/workflows/Chef%20Validation%20and%20Testing/badge.svg)
 
 # Description
 
