@@ -1,4 +1,4 @@
-![Chef Validation and Testing](https://github.com/mtharpe/chef-terraform-enterprise/workflows/Chef%20Validation%20and%20Testing/badge.svg)
+[![CircleCI](https://dl.circleci.com/status-badge/img/gh/mtharpe/chef-terraform-enterprise/tree/main.svg?style=shield)](https://dl.circleci.com/status-badge/redirect/gh/mtharpe/chef-terraform-enterprise/tree/main)
 
 # Description
 

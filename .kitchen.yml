@@ -7,25 +7,27 @@ driver:
 
 driver_config:
   network:
-  - ["forwarded_port", {guest: 8800, host: 8800}]
-  - ["forwarded_port", {guest: 80, host: 8080}]
-  - ["forwarded_port", {guest: 443, host: 8443}]
+    - ["forwarded_port", { guest: 8800, host: 8800 }]
+    - ["forwarded_port", { guest: 80, host: 8080 }]
+    - ["forwarded_port", { guest: 443, host: 8443 }]
+
 provisioner:
   sudo: true
   name: chef_zero
   product_name: chef
+  product_version: latest
   chef_license: accept
   install_strategy: always
   always_update_cookbooks: true
-
 
 verifier:
   name: inspec
 
 platforms:
-  - name: generic/ubuntu1604
-  - name: generic/ubuntu1804
-  - name: generic/ubuntu2004
+  - name: bento/ubuntu-22.04
+  - name: bento/ubuntu-24.04
+  - name: bento/rockylinux-8
+  - name: bento/rockylinux-9
 
 suites:
   - name: default

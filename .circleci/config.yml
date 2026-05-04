@@ -1,0 +1,43 @@
+version: 2.1
+
+executors:
+  chef-workstation:
+    docker:
+      - image: cimg/ruby:3.3
+    working_directory: ~/cookbook
+
+jobs:
+  lint:
+    executor: chef-workstation
+    steps:
+      - checkout
+      - run:
+          name: Install Cookstyle
+          command: gem install --no-document cookstyle
+      - run:
+          name: Cookstyle
+          command: cookstyle --display-cop-names .
+
+  unit:
+    executor: chef-workstation
+    steps:
+      - checkout
+      - run:
+          name: Install ChefSpec
+          command: gem install --no-document chef chefspec rspec-retry
+      - run:
+          name: Run ChefSpec
+          command: |
+            if [ -d spec ] && find spec -name '*_spec.rb' | grep -q .; then
+              chef exec rspec
+            else
+              echo "No specs to run"
+            fi
+
+workflows:
+  validate:
+    jobs:
+      - lint
+      - unit:
+          requires:
+            - lint

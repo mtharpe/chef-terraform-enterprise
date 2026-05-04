@@ -10,11 +10,9 @@
 #
 #     http://www.apache.org/licenses/LICENSE-2.0
 #
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+
+tfe = node['terraform_enterprise']
+installer_path = "#{Chef::Config[:file_cache_path]}/install.sh"
 
 directory '/etc/terraform.d' do
   owner 'root'
@@ -27,43 +25,46 @@ template '/etc/replicated.conf' do
   source 'replicated.conf.erb'
   owner 'root'
   group 'root'
-  mode '0755'
-  action :create
+  mode '0644'
+  sensitive true
 end
 
 template '/etc/terraform.d/settings.json' do
   source 'settings.json.erb'
   owner 'root'
   group 'root'
-  mode '0755'
-  action :create
-end
-
-remote_file "#{Chef::Config['file_cache_path']}/install.sh" do
-  source 'https://install.terraform.io/ptfe/stable'
-  owner 'root'
-  group 'root'
-  mode '0766'
-  action :create
-  notifies :run, 'execute[install_ptfe]', :delayed
-  not_if '`netstat -ant |grep LIST |grep 8800`'
+  mode '0644'
+  variables(
+    hostname: tfe['hostname'],
+    install_type: tfe['install_type']
+  )
 end
 
 cookbook_file '/etc/terraform.d/license.rli' do
-  source "#{node['terraform_enterprise']['license_file_location']}/license.rli"
+  source "#{tfe['license_file_location']}/license.rli"
+  owner 'root'
+  group 'root'
+  mode '0644'
+  sensitive true
+end
+
+remote_file installer_path do
+  source tfe['installer_url']
   owner 'root'
   group 'root'
   mode '0755'
-  action :create
+  not_if { ::File.exist?(installer_path) }
+  notifies :run, 'execute[install_ptfe]', :delayed
 end
 
 execute 'install_ptfe' do
-  command "#{Chef::Config['file_cache_path']}/install.sh no-proxy private-address=#{node['ipaddress']} public-address=#{node['ipaddress']}"
+  command "#{installer_path} no-proxy private-address=#{tfe['private_address']} public-address=#{tfe['public_address']}"
   action :nothing
+  not_if "ss -ltn '( sport = :#{tfe['admin_console_port']} )' | grep -q LISTEN"
 end
 
 chef_sleep 'finalizing_setup' do
-  seconds '410'
+  seconds tfe['post_install_sleep']
   action :nothing
   subscribes :sleep, 'execute[install_ptfe]', :delayed
 end
