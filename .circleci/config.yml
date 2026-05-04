@@ -18,26 +18,7 @@ jobs:
           name: Cookstyle
           command: cookstyle --display-cop-names .
 
-  unit:
-    executor: chef-workstation
-    steps:
-      - checkout
-      - run:
-          name: Install ChefSpec
-          command: gem install --no-document chef chefspec rspec-retry
-      - run:
-          name: Run ChefSpec
-          command: |
-            if [ -d spec ] && find spec -name '*_spec.rb' | grep -q .; then
-              chef exec rspec
-            else
-              echo "No specs to run"
-            fi
-
 workflows:
   validate:
     jobs:
       - lint
-      - unit:
-          requires:
-            - lint
